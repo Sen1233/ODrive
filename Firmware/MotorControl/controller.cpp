@@ -203,7 +203,18 @@ bool Controller::update() {
         case INPUT_MODE_TUNING: {
             autotuning_phase_ = wrap_pm_pi(autotuning_phase_ + (2.0f * M_PI * autotuning_.frequency * current_meas_period));
             pos_setpoint_ = autotuning_.pos_amplitude * our_arm_sin_f32(autotuning_phase_ + autotuning_.pos_phase);
-            vel_setpoint_ = autotuning_.vel_amplitude * our_arm_sin_f32(autotuning_phase_ + autotuning_.vel_phase);
+
+            float vel_base = our_arm_sin_f32(autotuning_phase_ + autotuning_.vel_phase);
+            float vel_val = vel_base;
+            // sin(x)^(2^burstfactor + 1)
+            if (autotuning_.vel_burst_factor > 0) {
+                for (int i = 0; i < autotuning_.vel_burst_factor; i++) {
+                    vel_val *= vel_val;
+                }
+                vel_val *= vel_base;
+            }
+            vel_setpoint_ = autotuning_.vel_amplitude * vel_val;
+
             torque_setpoint_ = autotuning_.torque_amplitude * our_arm_sin_f32(autotuning_phase_ + autotuning_.torque_phase);
         } break;
         default: {

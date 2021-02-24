@@ -20,6 +20,7 @@ public:
         float pos_phase = 0.0f;
         float vel_amplitude = 0.0f;
         float vel_phase = 0.0f;
+        uint8_t vel_burst_factor = 0; // sin(x)^(2^burstfactor + 1)
         float torque_amplitude = 0.0f;
         float torque_phase = 0.0f;
     };
